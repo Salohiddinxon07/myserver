@@ -1,17 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My App</title>
+    <meta charset="UTF-8">
+    <title>Telegram Chat</title>
+    <style>
+        body{
+            font-family: Arial;
+            background:#111;
+            color:white;
+            padding:20px;
+        }
+
+        #chat{
+            border:1px solid #444;
+            padding:10px;
+            height:300px;
+            overflow:auto;
+            background:#222;
+        }
+
+        .msg{
+            background:#333;
+            padding:8px;
+            margin:5px 0;
+            border-radius:8px;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Frontend + Backend Test</h1>
+<h2>Telegramdan kelgan xabarlar</h2>
 
-<button onclick="getSession()">Session olish</button>
+<div id="chat"></div>
 
-<pre id="out"></pre>
+<script>
+const BOT_TOKEN = '7905303120:AAFTHbtz_lDy4M4KxurDK0xKH63y7flT6VI';
+const CHAT_ID = '5513237031';
 
-<script src="app.js"></script>
+let oxirgiUpdate = 0;
+
+async function loadMessages(){
+
+    const res = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`
+    );
+
+    const data = await res.json();
+
+    const chat = document.getElementById('chat');
+
+    data.result.forEach(update => {
+
+        if(update.update_id > oxirgiUpdate){
+
+            oxirgiUpdate = update.update_id;
+
+            const text =
+                update.message?.text ||
+                '[text emas]';
+
+            const div = document.createElement('div');
+
+            div.className = 'msg';
+            div.innerText = text;
+
+            chat.appendChild(div);
+        }
+
+    });
+
+}
+
+setInterval(loadMessages, 3000);
+</script>
 
 </body>
 </html>
